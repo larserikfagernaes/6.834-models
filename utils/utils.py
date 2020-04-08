@@ -1,73 +1,316 @@
-"""
-Various utiltiy and testing functions
-"""
-from IPython.display import display, HTML, clear_output
-import numpy as np
-from numpy.linalg import  norm
-import torch
-# from RMPC import RMPC
-from nose.tools import assert_equal, assert_almost_equal
 
-def test_ok():
-    """If execution gets to this point, print out a happy message."""
-    try:
-        from IPython.display import display_html
-        display_html("""<div class="alert alert-success">
-        <strong>Tests passed!!</strong>
-        </div>""", raw=True)
-    except:
-        print("Tests passed!!")
+<!DOCTYPE HTML>
+<html>
 
-def check_horizontal_kernel(kernel,img):
-    canvas = cv2.imread('/content/modelsSemanticSegmentation/imgs/uniform_rectilinear_grid_2d.png',0)
-    kernel_horizontal = np.array([[-1,-1,-1],[2,2,2],[-1,-1,-1]])
-    kernel_horizontal = kernel_horizontal/norm(kernel_horizontal)
-    img_horizontal_feature = cv2.filter2D(canvas,-1,kernel_horizontal)
+<head>
+    <meta charset="utf-8">
 
-    #The kernel should be normalized
-    assert_equal(norm(kernel/norm(kernel)-kernel_horizontal/norm(kernel_horizontal))<1e-6,True)
-    assert_equal(norm(img_horizontal_feature-img)<1e-6,True)
-    pass
+    <title>utils.py (editing)</title>
+    <link id="favicon" rel="shortcut icon" type="image/x-icon" href="/user/larserikfagernaes/static/base/images/favicon-file.ico?v=e2776a7f45692c839d6eea7d7ff6f3b2">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <link rel="stylesheet" href="/user/larserikfagernaes/static/components/jquery-ui/themes/smoothness/jquery-ui.min.css?v=3c2a865c832a1322285c55c6ed99abb2" type="text/css" />
+    <link rel="stylesheet" href="/user/larserikfagernaes/static/components/jquery-typeahead/dist/jquery.typeahead.min.css?v=7afb461de36accb1aa133a1710f5bc56" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    
+<link rel="stylesheet" href="/user/larserikfagernaes/static/components/codemirror/lib/codemirror.css?v=288352df06a67ee35003b0981da414ac">
+<link rel="stylesheet" href="/user/larserikfagernaes/static/components/codemirror/addon/dialog/dialog.css?v=c89dce10b44d2882a024e7befc2b63f5">
 
-def check_vertical_kernek(kernel,img):
-    canvas = cv2.imread('/content/modelsSemanticSegmentation/imgs/uniform_rectilinear_grid_2d.png',0)
-    kernel_vertical = np.array([[-1,-1,-1],[2,2,2],[-1,-1,-1]]).T
-    kernel_vertical = kernel_vertical/norm(kernel_vertical)
-    img_vertical_feature = cv2.filter2D(canvas,-1,kernel_vertical)
+    <link rel="stylesheet" href="/user/larserikfagernaes/static/style/style.min.css?v=e91a43337d7c294cc9fab2938fa723b3" type="text/css"/>
+    
+
+    <link rel="stylesheet" href="/user/larserikfagernaes/custom/custom.css" type="text/css" />
+    <script src="/user/larserikfagernaes/static/components/es6-promise/promise.min.js?v=f004a16cb856e0ff11781d01ec5ca8fe" type="text/javascript" charset="utf-8"></script>
+    <script src="/user/larserikfagernaes/static/components/react/react.production.min.js?v=34f96ffc962a7deecc83037ccb582b58" type="text/javascript"></script>
+    <script src="/user/larserikfagernaes/static/components/react/react-dom.production.min.js" type="text/javascript"></script>
+    <script src="/user/larserikfagernaes/static/components/create-react-class/index.js?v=94feb9971ce6d26211729abc43f96cd2" type="text/javascript"></script>
+    <script src="/user/larserikfagernaes/static/components/requirejs/require.js?v=951f856e81496aaeec2e71a1c2c0d51f" type="text/javascript" charset="utf-8"></script>
+    <script>
+      require.config({
+          
+          urlArgs: "v=20200408013419",
+          
+          baseUrl: '/user/larserikfagernaes/static/',
+          paths: {
+            'auth/js/main': 'auth/js/main.min',
+            custom : '/user/larserikfagernaes/custom',
+            nbextensions : '/user/larserikfagernaes/nbextensions',
+            kernelspecs : '/user/larserikfagernaes/kernelspecs',
+            underscore : 'components/underscore/underscore-min',
+            backbone : 'components/backbone/backbone-min',
+            jed: 'components/jed/jed',
+            jquery: 'components/jquery/jquery.min',
+            json: 'components/requirejs-plugins/src/json',
+            text: 'components/requirejs-text/text',
+            bootstrap: 'components/bootstrap/dist/js/bootstrap.min',
+            bootstraptour: 'components/bootstrap-tour/build/js/bootstrap-tour.min',
+            'jquery-ui': 'components/jquery-ui/jquery-ui.min',
+            moment: 'components/moment/min/moment-with-locales',
+            codemirror: 'components/codemirror',
+            termjs: 'components/xterm.js/xterm',
+            typeahead: 'components/jquery-typeahead/dist/jquery.typeahead.min',
+          },
+          map: { // for backward compatibility
+              "*": {
+                  "jqueryui": "jquery-ui",
+              }
+          },
+          shim: {
+            typeahead: {
+              deps: ["jquery"],
+              exports: "typeahead"
+            },
+            underscore: {
+              exports: '_'
+            },
+            backbone: {
+              deps: ["underscore", "jquery"],
+              exports: "Backbone"
+            },
+            bootstrap: {
+              deps: ["jquery"],
+              exports: "bootstrap"
+            },
+            bootstraptour: {
+              deps: ["bootstrap"],
+              exports: "Tour"
+            },
+            "jquery-ui": {
+              deps: ["jquery"],
+              exports: "$"
+            }
+          },
+          waitSeconds: 30,
+      });
+
+      require.config({
+          map: {
+              '*':{
+                'contents': 'services/contents',
+              }
+          }
+      });
+
+      // error-catching custom.js shim.
+      define("custom", function (require, exports, module) {
+          try {
+              var custom = require('custom/custom');
+              console.debug('loaded custom.js');
+              return custom;
+          } catch (e) {
+              console.error("error loading custom.js", e);
+              return {};
+          }
+      })
+
+    document.nbjs_translations = {"domain": "nbjs", "locale_data": {"nbjs": {"": {"domain": "nbjs"}}}};
+    document.documentElement.lang = navigator.language.toLowerCase();
+    </script>
+
+    
+    
+
+</head>
+
+<body class="edit_app "
+ 
+data-base-url="/user/larserikfagernaes/"
+data-file-path="cog-rob-spring-2020/pset-sementic-segmentation/utils/utils.py"
+
+  
+ 
+
+dir="ltr">
+
+<noscript>
+    <div id='noscript'>
+      Jupyter Notebook requires JavaScript.<br>
+      Please enable it to proceed. 
+  </div>
+</noscript>
+
+<div id="header" role="navigation" aria-label="Top Menu">
+  <div id="header-container" class="container">
+  <div id="ipython_notebook" class="nav navbar-brand"><a href="/user/larserikfagernaes/tree" title='dashboard'>
+      
+<img src='/hub/logo' alt='Jupyter Notebook'/>
+
+  </a></div>
+
+  
+
+<span id="save_widget" class="pull-left save_widget">
+    <span class="filename"></span>
+    <span class="last_modified"></span>
+</span>
 
 
-    assert_equal(norm(kernel/norm(kernel)-kernel_vertical/norm(kernel_vertical))<1e-6,True)
-    assert_equal(norm(img_vertical_feature-img)<1e-6,True)
+  
 
-def check_numberOfObjects(number):
-    assert_equal(number,9)
+  
+  
 
-class Box_check:
-    def __init__(self, xTopLeft, yTopLeft, xBottomRight, yBottomRight):
-        self.xTopLeft = xTopLeft
-        self.yTopLeft = yTopLeft 
-        self.xBottomRight = xBottomRight 
-        self.yBottomRight = yBottomRight 
-    def __eq__(self, others):
-        if self.xTopLeft == others.xTopLeft \
-            and self.yTopLeft == others.yTopLeft \
-            and self.xBottomRight == others.xBottomRight \
-            and self.yBottomRight == others.yBottomRight:
-            return True
-        else:
-            return False
-class Pixel:
-    def __init__(self, x, y):
-        self.x = x 
-        self.y = y 
+  
+  
 
-def check_enclosingBox(func,img):
-    assert_equal(Box_check(0,86,211,198), func(img,Pixel(0,88)))
-    assert_equal(Box_check(0,66,20,85), func(img,Pixel(3,70)))
-    assert_equal(Box_check(0,118,468,263), func(img,Pixel(210,150)))
-    assert_equal(Box_check(208,92,250,200), func(img,Pixel(220,150)))
-    assert_equal(Box_check(0,0,466,108), func(img,Pixel(150,0)))
-    assert_equal(Box_check(248,104,468,213), func(img,Pixel(400,150)))
+    <span id="login_widget">
+      
+        <button id="logout" class="btn btn-sm navbar-btn">Logout</button>
+      
+    </span>
 
-def check_personOnRoad(func,img):
-    assert_equal(func(img),True)
+  
+
+  
+
+<span>
+    <a href='/hub/home'
+       class='btn btn-default btn-sm navbar-btn pull-right'
+       style='margin-right: 4px; margin-left: 2px;'>
+        Control Panel
+    </a>
+</span>
+
+  
+  </div>
+  <div class="header-bar"></div>
+
+  
+
+<div id="menubar-container" class="container">
+  <div id="menubar">
+    <div id="menus" class="navbar navbar-default" role="navigation">
+      <div class="container-fluid">
+          <p  class="navbar-text indicator_area">
+          <span id="current-mode" >current mode</span>
+          </p>
+        <button type="button" class="btn btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <i class="fa fa-bars"></i>
+          <span class="navbar-text">Menu</span>
+        </button>
+        <ul class="nav navbar-nav navbar-right">
+          <li id="notification_area"></li>
+        </ul>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">File</a>
+              <ul id="file-menu" class="dropdown-menu">
+                <li id="new-file"><a href="#">New</a></li>
+                <li id="save-file"><a href="#">Save</a></li>
+                <li id="rename-file"><a href="#">Rename</a></li>
+                <li id="download-file"><a href="#">Download</a></li>
+              </ul>
+            </li>
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Edit</a>
+              <ul id="edit-menu" class="dropdown-menu">
+                <li id="menu-find"><a href="#">Find</a></li>
+                <li id="menu-replace"><a href="#">Find &amp; Replace</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Key Map</li>
+                <li id="menu-keymap-default"><a href="#">Default<i class="fa"></i></a></li>
+                <li id="menu-keymap-sublime"><a href="#">Sublime Text<i class="fa"></i></a></li>
+                <li id="menu-keymap-vim"><a href="#">Vim<i class="fa"></i></a></li>
+                <li id="menu-keymap-emacs"><a href="#">emacs<i class="fa"></i></a></li>
+              </ul>
+            </li>
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">View</a>
+              <ul id="view-menu" class="dropdown-menu">
+              <li id="toggle_header" title="Show/Hide the logo and notebook title (above menu bar)">
+              <a href="#">Toggle Header</a></li>
+              <li id="menu-line-numbers"><a href="#">Toggle Line Numbers</a></li>
+              </ul>
+            </li>
+            <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Language</a>
+              <ul id="mode-menu" class="dropdown-menu">
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="lower-header-bar"></div>
+
+
+</div>
+
+<div id="site">
+
+
+<div id="texteditor-backdrop">
+<div id="texteditor-container" class="container"></div>
+</div>
+
+
+</div>
+
+
+
+
+
+
+    
+
+
+<script type='text/javascript'>
+  function _remove_redirects_param() {
+    // remove ?redirects= param from URL so that
+    // successful page loads don't increment the redirect loop counter
+    if (window.location.search.length <= 1) {
+      return;
+    }
+    var search_parameters = window.location.search.slice(1).split('&');
+    for (var i = 0; i < search_parameters.length; i++) {
+      if (search_parameters[i].split('=')[0] === 'redirects') {
+        // remote token from search parameters
+        search_parameters.splice(i, 1);
+        var new_search = '';
+        if (search_parameters.length) {
+          new_search = '?' + search_parameters.join('&');
+        }
+        var new_url = window.location.origin +
+                      window.location.pathname +
+                      new_search +
+                      window.location.hash;
+        window.history.replaceState({}, "", new_url);
+        return;
+      }
+    }
+  }
+  _remove_redirects_param();
+</script>
+
+
+<script src="/user/larserikfagernaes/static/edit/js/main.min.js?v=e554676a4f8e00669f107d9742f94e8d" type="text/javascript" charset="utf-8"></script>
+
+
+<script type='text/javascript'>
+  function _remove_token_from_url() {
+    if (window.location.search.length <= 1) {
+      return;
+    }
+    var search_parameters = window.location.search.slice(1).split('&');
+    for (var i = 0; i < search_parameters.length; i++) {
+      if (search_parameters[i].split('=')[0] === 'token') {
+        // remote token from search parameters
+        search_parameters.splice(i, 1);
+        var new_search = '';
+        if (search_parameters.length) {
+          new_search = '?' + search_parameters.join('&');
+        }
+        var new_url = window.location.origin + 
+                      window.location.pathname + 
+                      new_search + 
+                      window.location.hash;
+        window.history.replaceState({}, "", new_url);
+        return;
+      }
+    }
+  }
+  _remove_token_from_url();
+</script>
+</body>
+
+</html>
